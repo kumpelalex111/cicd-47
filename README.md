@@ -1,4 +1,4 @@
-# Домашнее задание к занятию "`GitLab`" - `Хрипун Алексей`
+# Домашнее задание к занятию "`Система мониторинга Zabbix` - `Хрипун Алексей`
 
 
 ### Инструкция по выполнению домашнего задания
@@ -26,18 +26,42 @@
 
 `Приведите ответ в свободной форме........`
 
-1. `В соответствии с инструкцией https://docs.gitlab.com/install/package/ubuntu/?tab=Community+Edition устанавливаем GitLab на виртуальную машину Ubuntu`
-2. `Создаем новый проект и пустой репозиторий`
-![new project](img/new_project.png)
-3. `Запускаем уоманду регистрации runner и производим регистрацию runner`
-![runner](img/runner_registry.png)
-   `Запускаем зарегистрированный runner командой:` 
-
+1. `Перед установкой серверной части Zabbix должны быть установлены poatgesql и Apache:`
 ```
-docker run -d --rm  --name gitlab-runner --network host -v /var/run/docker.sock:/var/run/docker.sock -v /srv/gitlab-runner/config:/etc/gitlab-runner gitlab/gitlab-runner:latest
+apt install postgresql apache2
+```
+2. `Далее нужно создать пользователя zabbix и базу данных zabbix в СУБД postgresql:`
+```
+su - postgres -c 'psql --command "CREATE USER zabbix WITH PASSWORD '\'p@ssw0rd\' ';" '
+su - postgres -c 'psql --command "CREATE DATABASE zabbix OWNER zabbix;" '
+```
+3. `Теперь можно приступать к установке. Скачиваем и устанавливаем пакет для добавления репозитория Zabbix:`
+```
+wget https://repo.zabbix.com/zabbix/7.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_latest_7.0+ubuntu24.04_all.deb
+dpkg -i zabbix-release_latest_7.0+ubuntu24.04_all.deb
+apt update
+```
+`И сама установка сервера Zabbix и веб-интерфейса (агент пока не устанавливаем):`
+```
+apt install zabbix-server-pgsql zabbix-frontend-php php8.3-pgsql zabbix-apache-conf zabbix-sql-scripts
 ```
 
-![runner](img/Runner.png)
+4. `Импортируем начальную схему и данные в базу данных zabbix:`
+```
+zcat /usr/share/zabbix-sql-scripts/postgresql/server.sql.gz | sudo -u zabbix psql zabbix
+```
+
+5. `В файле /etc/zabbix/zabbix_server.conf указываем пароль для базы данных в строке DBPassword=`
+6. `Перезапускаем службы и ставим на автозапуск:`
+```
+systemctl restart zabbix-server apache2
+systemctl enable zabbix-server apache2 
+```
+
+`Теперь можно начинать первоначальную конфигурацию Zabbix-сервера`
+![wizard первоначальной настройки](img/zabbix1.png)
+`Пройдя все шаги, проходим аутентификацию по логину и паролю, которые установлены по умолчанию:`
+![wizard первоначальной настройки](img/zabbix2.png)
 
 
 ---
@@ -46,60 +70,54 @@ docker run -d --rm  --name gitlab-runner --network host -v /var/run/docker.sock:
 
 `Приведите ответ в свободной форме........`
 
-1. `Клонируем репозиторий https://github.com/netology-code/sdvps-materials/tree/main/gitlab на промежуточную машину. На этой машине подключаем внешний репозиторий GitLab:`
+1. `Чтобы установить агент на системе Linux, нужно добавить репозиторий zabbix (по аналогии с установкой серверной чести):
 ```
-git remote add netology http://192.168.190.130/root/test.git
-```
-`Сонхронизируемся с удаленным репозиторием (git pull netology)`
-`Копируем содержимое репозитория с Github в промежуточный, коммитим новые файлы и отправляем их в репозиторий GitLab`
-```
-git add .
-git status
-git commit -am "new1"
-git push netology
-```
- 
-
-2. `Создаем файл .gitlab-ci.yml file. Здесь стадии test и build зависят от compile, и после того, как compile отработает, обе stage запускаются одновременно`
-```
-stages:
-  - compile
-  - test
-  - build
-
-compile:
-  stage: compile
-  before_script:
-      - echo "Hello  " | tr -d "\n" > file1.txt
-      - echo "world" > file2.txt
-  script: cat file1.txt file2.txt > compiled.txt
-  artifacts:
-    paths:
-    - compiled.txt
-    expire_in: 20 minutes
-  tags: 
-    - test
-
-test:
-  stage: test
-  image: golang:1.17
-  script:
-    - go test .
-  tags:
-    - netology
-  needs: ["compile"]
-
-build:
-  stage: build
-  image: docker:latest
-  script:
-    - docker build .
-  tags:
-    - test
-  needs: ["compile"]
+wget https://repo.zabbix.com/zabbix/7.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_latest_7.0+ubuntu24.04_all.deb
+dpkg -i zabbix-release_latest_7.0+ubuntu24.04_all.deb
+apt update
 ```
 
-![выполнение сразу двух stages](img/parallel_run.png)
-![выполнение всех stages](img/Complete.png)
+2. `Далее устанавливаем на системах агент zabbix:`
+```
+apt install zabbix-agent
+```
+3. `Находим файл /etc/zabbx/za    и указываем IP-адрес сервера Zabbix`
+4. `На сервере Zabbix в конфигурационном файле zabbix_server.conf в параметре StatsAllowedIP нужно указать подсеть, из которой нужно принимать данные для монторинга:`
+```
+StatsAllowedIP=192.168.190.0/24,127.0.0.1
+```
+5. `В разделе Data collection добавляем хосты для мониторинга. Указываем шаблон Linux by Zabbix agent`
+6. 
+
+```
+Поле для вставки кода...
+....
+....
+....
+....
+```
+
+`При необходимости прикрепитe сюда скриншоты
+![Название скриншота 2](ссылка на скриншот 2)`
+
 
 ---
+
+### Задание 3
+
+`Приведите ответ в свободной форме........`
+
+1. `Скачиваем архив с агентом для Windows с официального сайта Zabbix`
+2. `На системе Windows в йонфигурационном файле zabbix_agent2.conf указываем IP-адрес сервера Zabbix и расположение лог-файла агента. 
+устанавливаем агент как службу:`
+```
+zabbix_agent2.exe -i -c c:\zabbix\conf\zabbix_agent2.conf -S delayed
+```
+3. `Запускаем службу`
+4. `На сервере Zabbix добавлям систему Windows для мониторинга (шаблон выбираем Windows by Zabbix agent)`
+
+
+![Windows на мониторинге](img/Zabbix_win1.png)
+![Windows получение данных](img/Win_zabbix_C.png)
+![Windows данные о диске С:](img/Win_zabbix_2.png)
+
