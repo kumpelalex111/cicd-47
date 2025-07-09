@@ -70,7 +70,7 @@ systemctl enable zabbix-server apache2
 
 `Приведите ответ в свободной форме........`
 
-1. `Чтобы установить агент на системе Linux, нужно добавить репозиторий zabbix (по аналогии с установкой серверной чести):
+1. `Чтобы установить агент на системе Linux, нужно добавить репозиторий zabbix (по аналогии с установкой серверной чести.):`
 ```
 wget https://repo.zabbix.com/zabbix/7.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_latest_7.0+ubuntu24.04_all.deb
 dpkg -i zabbix-release_latest_7.0+ubuntu24.04_all.deb
@@ -91,7 +91,7 @@ StatsAllowedIP=192.168.190.0/24,127.0.0.1
 
 ![Поступление данных от агента на сервере Zabbix](img/zabbix_server_agent_data.png)
 
-![Поступление данных от агента на хосте test2](img/zabbix2.test2_data.png)
+![Поступление данных от агента на хосте test2](img/test2_data.png)
 
 
 ---
@@ -101,8 +101,8 @@ StatsAllowedIP=192.168.190.0/24,127.0.0.1
 `Приведите ответ в свободной форме........`
 
 1. `Скачиваем архив с агентом для Windows с официального сайта Zabbix`
-2. `На системе Windows в йонфигурационном файле zabbix_agent2.conf указываем IP-адрес сервера Zabbix и расположение лог-файла агента. 
-устанавливаем агент как службу:`
+2. `На системе Windows в конфигурационном файле zabbix_agent2.conf указываем IP-адрес сервера Zabbix и расположение лог-файла агента. 
+Устанавливаем агент как службу:`
 ```
 zabbix_agent2.exe -i -c c:\zabbix\conf\zabbix_agent2.conf -S delayed
 ```
