@@ -75,7 +75,7 @@ interface FastEthernet2/0
 
 ### Задание 2
 
-`BASH скрипт для проверки подкобчения по порту 80 и налиция файла index.html:`
+`BASH скрипт для проверки подключения к порту 80 и наличия файла index.html:`
 ```
 #!/bin/bash
 nc -z -w 3 127.0.0.1 80 && check=0 || check=1
@@ -120,9 +120,9 @@ vrrp_instance N1 {
         test_nginx
     }
 } 
-
-
-
+```
+`BACKUP:`
+```
 global_defs {
     enable_script_security
 }
@@ -160,7 +160,7 @@ vrrp_instance N1 {
 
 `На сервере 192.168.190.128 (это MASTER) останавливаем nginx и проверяем доступность сервера:`
 ![Задание 2](img/step2.png)
-
+`Переключение произошло.`
 ---
 
 ### Задание 3
