@@ -1,4 +1,4 @@
-# Домашнее задание к занятию "`Домашнее задание к занятию 1 «Disaster recovery и Keepalived»`" - Хрипун Алексей
+# Домашнее задание к занятию `Домашнее задание к занятию 1 «Disaster recovery и Keepalived»` - Хрипун Алексей
 
 ---
 
@@ -75,9 +75,91 @@ interface FastEthernet2/0
 
 ### Задание 2
 
+`BASH скрипт для проверки подкобчения по порту 80 и налиция файла index.html:`
+```
+#!/bin/bash
+nc -z -w 3 127.0.0.1 80 && check=0 || check=1
+echo "$check"
 
-![Задание 2](img/task2_1.png)
-![Задание 2](img/task2_2.png)
+if [[ -f /var/www/html/index.html ]] && [[ "$check" == 0 ]]; then
+        echo "OK"
+else
+        exit 1
+fi
+```
+`На серверах устанавливаем nginx и keepalived. На обоих серверах настраиваем keepalive. Один из серверов MASTER, второй BACKUP:`
+```
+/var/www/test_nginx.sh
+
+
+global_defs {
+    enable_script_security
+}
+
+vrrp_script test_nginx {
+    script "/var/www/test_nginx.sh"
+    interval 3
+    user www-data
+
+}
+
+vrrp_instance N1 {
+    state MASTER
+    interface ens33
+    virtual_router_id 150
+    priority 255
+    advert_int 1
+    authentication {
+        auth_type PASS
+        auth_pass p@ssword
+    }
+    virtual_ipaddress {
+        192.168.190.150
+    }
+    track_script {
+        test_nginx
+    }
+} 
+
+
+
+global_defs {
+    enable_script_security
+}
+
+vrrp_script test_nginx {
+    script "/var/www/test_nginx.sh"
+    interval 3
+    user www-data
+
+}
+
+vrrp_instance N1 {
+    state BACKUP
+    interface ens33
+    virtual_router_id 150
+    priority 100
+    advert_int 1
+    authentication {
+        auth_type PASS
+        auth_pass p@ssword
+    }
+    virtual_ipaddress {
+        192.168.190.150
+    }
+    track_script {
+        test_nginx
+    }
+}
+```
+`Проверяем доступность по всем трем адресам:`
+
+![Задание 2](img/step1.png)
+![Задание 2](img/step1_1.png)
+![Задание 2](img/step1_2.png)
+
+`На сервере 192.168.190.128 (это MASTER) останавливаем nginx и проверяем доступность сервера:`
+![Задание 2](img/step2.png)
 
 ---
 
