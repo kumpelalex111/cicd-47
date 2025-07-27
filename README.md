@@ -169,9 +169,75 @@ vrrp_instance N1 {
 ---
 
 ### Задание 3
+`Создадим скрипт, который проверяет параметр системы load average за 1 минуту. На серверах устанволен приоритет 160 (на самом мощном), 150 на втором и 145 третьем. Поэтому в скрипте установлено максимальное значение средней загрузки в 140. При превышении этого порога (не важно на сколько) VIP (virtual ip) переместится на другой сервер`
+```
+#!/bin/bash
+load=$(cat /proc/loadavg | cut -d ' ' -f 1)
+load=${load%.*}
+if [[ $load -ge 140 ]]; then
+        let final=140
+        echo "$final" > /var/www/load_average.txt
+else
+        echo "$load" > /var/www/load_average.txt
+fi
+```
+`Нужно не забыть сделать скрипт исполняемым и добавить скрипт в cron (командой crontab -e):`
+```
+*/1 * * * *  /etc/keepalived/test_load_average.sh
+```
+`Теперь нужно добавить файл /var/www/load_average.txt для отслеживания в keepalived.conf (вес указываем -1, т.к. значение нужно вычитать из заданного приоритета):`
+```
+global_defs {
+    enable_script_security
+}
+
+vrrp_script test_nginx {
+    script "/var/www/test_nginx.sh"
+    interval 3
+    user www-data
+
+}
+
+vrrp_track_file load_average {
+    file /var/www/load_average.txt
+}
 
 
-![Задание 3](img/task3_1.png)
-![Задание 3](img/task3_2.png)
+vrrp_instance N1 {
+    state BACKUP
+    interface ens33
+    virtual_router_id 150
+    priority 160
+    advert_int 1
+    authentication {
+        auth_type PASS
+        auth_pass p@ssword
+    }
+    virtual_ipaddress {
+        192.168.190.150
+    }
+    track_script {
+        test_nginx
+    }
+    track_file {
+        load_average weight -1
+    }
 
+}
+
+```  
+`Делаем аналогичные шаги на двух других серверах.`
+`Проверяем доступность сайта на всех четырех адресах`
+`Теперь утилитой stress-ng подаем нагрузку на первый сервер. Через какое-то время его приоритет падает, и VIP переходит на сервер test1:`
+![Задание 3](img/test1.png)
+![Задание 3](img/test2.png)
+
+`Подаем нагрузку на второй сервер (test1) и через какое-то время его приоритет также падает и VIP переходит на третий сервер:`
+![Задание 3](img/test3.png)
+
+`Снимаем нагрузку с первого сервера. Его приоритет начинает расти, и через какое-то время он забирает роль MASTER по приоритету у сервера test3:`
+![Задание 3](img/again_master.png)
+![Задание 3](img/test4.png)
+
+---
 
