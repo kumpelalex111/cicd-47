@@ -65,13 +65,16 @@ frontend example
 
 backend web_local1
         balance roundrobin
-        server s1 127.0.0.1:6666
-        server s2 127.0.0.1:7777
+        option httpchk
+        http-check send meth GET uri /index.html
+        server s1 127.0.0.1:6666 check
+        server s2 127.0.0.1:7777 check
 backend web_local2
         balance roundrobin
-        server s3 127.0.0.1:8888
-        server s4 127.0.0.1:9999
-
+        option httpchk
+        http-check send meth GET uri /index.html
+        server s3 127.0.0.1:8888 check
+        server s4 127.0.0.1:9999 check
 ```
 `Запускаем 4 разных сервера на разных портах:`
 ![Запросы](img/task4_1.png)
