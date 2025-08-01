@@ -11,6 +11,7 @@ listen web_example
         server s2 127.0.0.1:8888 check inter 2s
 ```
 [Конфигурационный файл haproxy.cfg для Задания 1](https://github.com/kumpelalex111/cicd-47/blob/main/task1/haproxy.cfg)
+
 ![Запросы](img/task1.png)
  
 
@@ -40,6 +41,8 @@ backend web_example
 
 ```
 [Конфигурационный файл haproxy.cfg для Задания 2](https://github.com/kumpelalex111/cicd-47/blob/main/task2/haproxy.cfg)
+` `
+
 ![Запросы](img/task2_request1.png)
 `Т.к. натсроена статистика, можно проверить:`
 ![Запросы](img/task2_3.png)
@@ -77,6 +80,7 @@ backend web_local2
         server s4 127.0.0.1:9999 check
 ```
 [Конфигурационный файл haproxy.cfg для Задания 4](https://github.com/kumpelalex111/cicd-47/blob/main/task4/haproxy.cfg)
+`  `
 `Запускаем 4 разных сервера на разных портах:`
 ![Запросы](img/task4_1.png)
 `Отправляем запросы:`
