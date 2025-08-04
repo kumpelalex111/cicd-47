@@ -1,89 +1,42 @@
-# Домашнее задание к занятию 2 «Кластеризация и балансировка нагрузки» - Хрипун Алексей
+# Домашнее задание к занятию 3 «Резервное копирование» - Хрипун Алексей
 
 ---
 
 ### Задание 1
-`Конфигурация HAProxy для балансировки на 4 уровне OSI:`
-```
-listen web_example
-        bind :5555
-        server s1 127.0.0.1:7777 check inter 2s
-        server s2 127.0.0.1:8888 check inter 2s
-```
-[Конфигурационный файл haproxy.cfg для Задания 1](https://github.com/kumpelalex111/cicd-47/blob/main/task1/haproxy.cfg)
 
-![Запросы](img/task1.png)
+![Синхронизация каталога](img/task1.png)
+
+`Если из домашнего каталога удалить файл, например, file.test, в новой резервной копии его также не будет:`
+
+![Синхронизация удаления](img/task1_1.png)
  
 
 ### Задание 2
 
-`Конфигурационный файл HAProxy (в блоке listen stats настраиваем ведение статистики):`
+`Скрипт для ежедневного резервного копирования домашнего каталога. Для удобства мониторинга задания лог пишется не только в системный журнал, но и в отдельный лог-файл:`
 ```
-listen stats
-        bind            :888
-        mode            http
-        stats           enable
-        stats uri       /stats
-        stats refresh   5s
-        stats realm     Haproxy\ Statistics
-
-
-frontend example
-        acl ACL_example  hdr(host) -i example.com
-        bind    :8088
-        use_backend web_example if ACL_example
-
-backend web_example
-        balance roundrobin
-        server s1 127.0.0.1:7777 weight 2
-        server s2 127.0.0.1:8888 weight 3
-        server s3 127.0.0.1:9999 weight 4
-
+#!/bin/bash
+rsync -a --delete --checksum /home/fox/ /tmp/backup
+if [[ $? -eq 0 ]]; then
+        echo "$(date +"%Y-%m-%dT%H:%M:%S.%6N")       $HOSTNAME   Backup for the fox user has been completed" | tee -a /var/log/syslog  >> /var/log/backup_home_fox.txt
+else
+        echo "$(date +"%Y-%m-%dT%H:%M:%S.%6N")       $HOSTNAME   Backup FAILED for the fox user" | tee -a /var/log/syslog >> /var/log/backup_home_fox.txt
+fi
 ```
-[Конфигурационный файл haproxy.cfg для Задания 2](https://github.com/kumpelalex111/cicd-47/blob/main/task2/haproxy.cfg)
+![Запуск скрипта](img/task2_2.png)
 
+`Результат выполнения скрипта пишется в лог-файлы. При одном из запусков быз изменен каталог для копирования. Неудачный запуск также попал в лог файлы:`
+![Запись в журналы](img/task2_3.png)
 
-![Запросы](img/task2_request1.png)
-`Т.к. натсроена статистика, можно проверить:`
-![Запросы](img/task2_3.png)
+`После отладки скрипта он был поставлен на ежедневное выполнение с помощью cron`
+![Запись в журналы](img/task2_4.png)
+
+### Задание 3
+
+![Запросы](img/task3_1.png)
+
 
 ### Задание 4
 `Конфигурационный файл HAProxy с разными backends:`
 ```
-listen stats
-        bind            :888
-        mode            http
-        stats           enable
-        stats uri       /stats
-        stats refresh   5s
-        stats realm     Haproxy\ Statistics
-
-
-frontend example
-        acl ACL_local1  hdr(host) -i example1.local
-        acl ACL_local2  hdr(host) -i example2.local
-        bind    :8088
-        use_backend web_local1 if ACL_local1
-        use_backend web_local2 if ACL_local2
-
-backend web_local1
-        balance roundrobin
-        option httpchk
-        http-check send meth GET uri /index.html
-        server s1 127.0.0.1:6666 check
-        server s2 127.0.0.1:7777 check
-backend web_local2
-        balance roundrobin
-        option httpchk
-        http-check send meth GET uri /index.html
-        server s3 127.0.0.1:8888 check
-        server s4 127.0.0.1:9999 check
-```
-[Конфигурационный файл haproxy.cfg для Задания 4](https://github.com/kumpelalex111/cicd-47/blob/main/task4/haproxy.cfg)
-
-
-`Запускаем 4 разных сервера на разных портах:`
-![Запросы](img/task4_1.png)
-`Отправляем запросы:`
-![Запросы](img/task4.png)
 
