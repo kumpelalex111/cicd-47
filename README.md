@@ -40,6 +40,42 @@ fi
 
 
 ### Задание 4
-`Конфигурационный файл HAProxy с разными backends:`
+`Скрипт для создания резервной копии пользователя. Папка с ключами не резервируется`
 ```
+#!/bin/bash
+SOURCE="fox@192.168.190.130:/home/fox/"
+DATE_BACKUP=$(date +"%d-%m-%Y-%H-%M-%S")
+DEST="/backup/${DATE_BACKUP}"
+KEY="/home/alex/.ssh/rock_ed25519"
+LAST_BACKUP=$(cat /distrib/last_backup)
+
+rsync -a -v --delete --checksum --exclude="/.ssh/" --link-dest=/backup/${LAST_BACKUP} -e "ssh -i $KEY" $SOURCE  $DEST
+if [[ $? -eq 0 ]]; then
+        echo "${DATE_BACKUP}" > /distrib/last_backup # сохраняем дату предыдущего backup
+        find /backup -maxdepth 1 -type d -ctime +5 | xargs rm -r # удаляем старые бекапы
+else
+        echo "Backup failed"
+        exit 1
+fi
+```
+[Запуск по расписанию](https://github.com/kumpelalex111/cicd-47/blob/main/root)
+
+![Запуск резервного копирования](img/task4_1.png)
+
+`Скрипт для восстановления резервной копии на заданную дату:`
+```
+#!/bin/bash
+
+SOURCE="/backup/$1/"
+DEST="fox@192.168.190.130:/home/fox"
+KEY="/home/alex/.ssh/rock_ed25519"
+
+rsync -a -e "ssh -i $KEY" $SOURCE  $DEST
+```
+[Запуск по расписанию](https://github.com/kumpelalex111/cicd-47/blob/main/root)
+
+![Запуск восстановления](img/task4_2.png)
+![Запуск восстановления](img/task4_3.png)
+
+
 
