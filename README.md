@@ -58,7 +58,7 @@ else
         exit 1
 fi
 ```
-[Запуск по расписанию](https://github.com/kumpelalex111/cicd-47/blob/main/root)
+[Срипт для резервного копирования домашнего каталога](https://github.com/kumpelalex111/cicd-47/blob/main/backup_home.sh)
 
 ![Запуск резервного копирования](img/task4_1.png)
 
@@ -72,10 +72,11 @@ KEY="/home/alex/.ssh/rock_ed25519"
 
 rsync -a -e "ssh -i $KEY" $SOURCE  $DEST
 ```
-[Запуск по расписанию](https://github.com/kumpelalex111/cicd-47/blob/main/root)
+[Скрипт для восстановления домашнего каталога на указанную дату](https://github.com/kumpelalex111/cicd-47/blob/main/restore_home.sh)
 
 ![Запуск восстановления](img/task4_2.png)
 ![Запуск восстановления](img/task4_3.png)
 
+---
 
 
