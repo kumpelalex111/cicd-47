@@ -37,7 +37,9 @@
 ### Решение 4
 
 ![REDIS](img/REDIS_set_get.png)
+
 `Получить все имеющиеся ключи можно так:`
+
 ![REDISi KEYS](img/REDIS_keys.png)
 
 ### Задание 5. Работа с числами
