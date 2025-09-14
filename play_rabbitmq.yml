@@ -1,0 +1,60 @@
+---
+- name: "RabbitMQ cluster"
+  hosts: "all"
+  become: true
+  tasks:
+  - name: "Install RabbitMQ"
+    ansible.builtin.apt:
+      name: rabbitmq-server
+      state: latest
+      update_cache: true
+  
+  - name: "Install rabbitmq_management"
+    community.rabbitmq.rabbitmq_plugin:
+      names: rabbitmq_management
+      state: enabled
+
+  - name: "Add user to server"
+    community.rabbitmq.rabbitmq_user:
+      user: alex
+      password: p@ssw0rd
+      tags: administrator
+      vhost: /
+      configure_priv: .*
+      read_priv: .*
+      write_priv: .*
+      state: present
+
+  - name: "Copy key for cluster"
+    ansible.builtin.copy:
+      src: files/.erlang.cookie
+      dest: /var/lib/rabbitmq/.erlang.cookie
+      owner: rabbitmq
+      group: rabbitmq
+      mode: '0400'
+
+  - name: "Reload Rabbitmq"
+    ansible.builtin.service:
+      name: "rabbitmq-server"
+      state: "restarted"
+
+  - name: "Policy"
+    ansible.builtin.command:
+      cmd:  rabbitmqctl set_policy ha-all "" '{"ha-mode":"all","ha-sync-mode":"automatic"}'
+
+
+- name: "Join to cluster"
+  hosts: "slave"
+  become: true
+  tasks:
+  - name: "Stop apps"
+    ansible.builtin.command:
+      cmd: rabbitmqctl stop_app
+
+  - name: "Join cluster"
+    ansible.builtin.command:
+      cmd: rabbitmqctl join_cluster rabbit@test2
+
+  - name: "Start app"
+    ansible.builtin.command:
+      cmd: rabbitmqctl start_app 
