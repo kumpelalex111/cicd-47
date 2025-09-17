@@ -41,7 +41,7 @@ CREATE USER 'sys_temp'@'localhost' IDENTIFIED BY 'P@ssw0rd';
 GRANT ALL PRIVILEGES ON *.* TO 'sys_temp'@'localhost' WITH GRANT OPTION; 
 ```
 Список пользователей: 
-![List users](img/task1.png)
+![List users](img/task1_1.png)
 
 Список прав для пользователя sys_temp:
 ![List privileges](img/task1_2.png)
