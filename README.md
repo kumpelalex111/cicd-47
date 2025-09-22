@@ -11,7 +11,7 @@
 
 ### Решение 1
 ```
-SELECT s.first_name,  s.last_name, ci.city, number_customers 
+SELECT CONCAT(s.first_name, " ",  s.last_name) AS name, ci.city, number_customers 
 FROM staff s RIGHT JOIN ( 
 	SELECT store_id, COUNT(*) AS number_customers
 	FROM customer
@@ -20,6 +20,7 @@ FROM staff s RIGHT JOIN (
 JOIN address a ON s.address_id = a.address_id
 JOIN city ci ON a.city_id = ci.city_id;
 ```
+
 ![task1](img/task1.png)
 
 ## Задание 2
