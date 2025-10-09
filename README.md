@@ -32,7 +32,7 @@
 *Приведите ответ в свободной форме.*
 
 ### Решение 2
-2.1 Базу данных будем бэкапить в динарном формате, чтобы использовать многопоточное восстановление и сжатие:
+2.1 Базу данных будем бэкапить в бинарном формате, чтобы использовать многопоточное восстановление и сжатие:
 ```
 pg_dump -Fc  base_test  -f  base_test.dump
 
@@ -46,7 +46,6 @@ pg_restore --create -j 5 -d base_test.dump
 ```
 db_name=base_test
 db_user=dbuser
-backupfolder=~/postgresql/backups 
 sqlfile=$backupfolder/database-$(date +%d-%m-%Y_%H-%M-%S).sql
 
 if pg_dump -U $db_user $db_name > $sqlfile ; then
