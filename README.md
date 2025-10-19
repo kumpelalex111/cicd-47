@@ -58,7 +58,7 @@ hydra -L users.txt -P pass.txt < ip-адрес > ssh
 ![hydra](img/task2_2.png)
 
 В логах fail2ban видно, что атакующий хост на какое-то время был заблокирован:
-![hydra](img/task2_33.png)
+![hydra_fail2ban](img/task2_33.png)
 
 В логах Suricata также видны неудачные попытки аутентификации по SSH:
 ![hydra_Suricata](img/task2_4.png)
