@@ -67,3 +67,20 @@ docker rm -f custom-nginx-t2
 
 ![compose2](img/5_3.png)
 
+Нужно переименовать образ kumpelalex111/custom-nginx:1.0.0 в localhost:5000/custom-nginx:latest:
+```
+docker tag kumpelalex111/custom-nginx:1.0.0 localhost:5000/custom-nginx:latest
+```
+Пушим этот образ в локальный registry:
+```
+docker push localhost:5000/custom-nginx:latest
+```
+Удаляем локально закешированные образы:
+```
+docker image remove kumpelalex111/custom-nginx:1.0.0
+docker image remove localhost:5000/custom-nginx:latest
+```
+Проверяем, что образов нет, пулим облаз ид локального registry и снова проверяем:
+![local](img/5_4.png)
+
+
