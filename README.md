@@ -80,7 +80,7 @@ docker push localhost:5000/custom-nginx:latest
 docker image remove kumpelalex111/custom-nginx:1.0.0
 docker image remove localhost:5000/custom-nginx:latest
 ```
-Проверяем, что образов нет, пулим облаз ид локального registry и снова проверяем:
+Проверяем, что образов нет, пулим образ из локального registry и снова проверяем:
 ![local](img/5_4.png)
 
 
