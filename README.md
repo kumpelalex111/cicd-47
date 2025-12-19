@@ -83,4 +83,23 @@ docker image remove localhost:5000/custom-nginx:latest
 Проверяем, что образов нет, пулим образ из локального registry и снова проверяем:
 ![local](img/5_4.png)
 
+Открываем Portainer и осле начальной настройки переходим в local окружение в web-editor и деплоим указанный compose:
+![deploy](img/5_13_1.png)
+
+Переходим к контейнеру и смотрим inspect:
+![inspect1](img/5_15.png)
+
+![inspect2](img/5_16.png)
+
+Удалим манифест compose.yaml и продуем запустить docker-compose поект. Выдается сообщение, что найден "бесхозный" контейнер - контейнер, который не описан в docker-compose файле. Предлагается такие контейнеры удалить.
+![del](img/5_17_0.png)
+
+Удаляем:
+![del1](img/5_17.png)
+
+Проверяем:
+![del2](img/5_18.png)
+
+
+
 
