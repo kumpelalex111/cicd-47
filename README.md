@@ -91,7 +91,7 @@ docker image remove localhost:5000/custom-nginx:latest
 
 ![inspect2](img/5_16.png)
 
-Удалим манифест compose.yaml и продуем запустить docker-compose поект. Выдается сообщение, что найден "бесхозный" контейнер - контейнер, который не описан в docker-compose файле. Предлагается такие контейнеры удалить.
+Удалим манифест compose.yaml и пробуем запустить docker-compose поект. Выдается сообщение, что найден "бесхозный" контейнер - контейнер, который не описан в docker-compose файле. Предлагается такие контейнеры удалить.
 ![del](img/5_17_0.png)
 
 Удаляем:
@@ -100,6 +100,10 @@ docker image remove localhost:5000/custom-nginx:latest
 Проверяем:
 ![del2](img/5_18.png)
 
+Останавливаем проект:
+```
+docker compose down
+```
 
 
 
